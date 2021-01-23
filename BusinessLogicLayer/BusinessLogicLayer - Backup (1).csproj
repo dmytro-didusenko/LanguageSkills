@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\Category.cs" Link="Category.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\CategoryTranslation.cs" Link="CategoryTranslation.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\Language.cs" Link="Language.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\SubCategory.cs" Link="SubCategory.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\SubCategoryTranslation.cs" Link="SubCategoryTranslation.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\Test.cs" Link="Test.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\TestTranslation.cs" Link="TestTranslation.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\Word.cs" Link="Word.cs" />
+    <Compile Include="..\LanguageSkills.DataAccessLayer\DataBaseModels\WordTranslation.cs" Link="WordTranslation.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
+  </ItemGroup>
+
+</Project>
