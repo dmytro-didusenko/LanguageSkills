@@ -8,8 +8,4 @@
     <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Initiaializer\Interfaces\" />
-  </ItemGroup>
-
 </Project>
