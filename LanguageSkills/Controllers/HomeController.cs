@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BusinessLogicLayer;
+using BusinessLogicLayer.Initializer.Implementation;
 using DataAccessLayer;
 using DataAccessLayer.DataBaseModels;
 
@@ -15,6 +16,10 @@ namespace LanguageSkills.Controllers
 
         public void Index()
         {
+            Initialize initializeLanguages = new Initialize();
+            var path = initializeLanguages.CreatePath();
+            var worksheet = initializeLanguages.GetDataFromFile(path);
+            initializeLanguages.ParseData(worksheet);
 
             //Category category = new Category();
             //category.CategoryName = "New";
