@@ -64,8 +64,9 @@ namespace BusinessLogicLayer.Initializer.Implementation
 
         public void WriteLanguageDataToDataBase()
         {
-            //Write data to languages table
+            //Get data from file
             List<ParsedData> languageData = ParseData(GetDataFromFile(CreatePath()));
+            //Write data to languages table
             List<Language> allLanguages = new List<Language>();
             for (int i = 0, j = 0; i < languageData.Count; i++)
             {
@@ -86,8 +87,10 @@ namespace BusinessLogicLayer.Initializer.Implementation
                 _unitOfWork.Save();
             }
 
-            //Write data to languageTranlations table
+            //Get all languages
             allLanguages = _unitOfWork.Languages.GetAll().ToList();
+
+            //Write data to languageTranlations table to dataBase
             foreach (var language in languageData)
             {
                 try
@@ -113,11 +116,52 @@ namespace BusinessLogicLayer.Initializer.Implementation
             }
         }
 
-        public void WriteDataToDataBase()
+        public void WriteTestDataToDataBase()
         {
-            
+            //Get data from file
+            List<ParsedData> testData = ParseData(GetDataFromFile(CreatePath("", "TestsNames")));
 
-            throw new NotImplementedException();
+            //Get all list of test
+            List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
+
+            //Write data to test table and save to dataBase
+            Test test = new Test();
+            foreach (var testItem in testData.Where(testItem => test.TestName != testItem.Word))
+            {
+                test.Id = 0;
+                test.TestName = testItem.Word;
+                _unitOfWork.Tests.Create(test);
+                _unitOfWork.Save();
+            }
+
+            //Get all tests
+            List<Test> allTests = _unitOfWork.Tests.GetAll().ToList();
+
+            //Write test translation and save to dataBase
+            foreach (var testItem in testData)
+            {
+                try
+                {
+                    int idTest = allTests.First(l => l.TestName == testItem.Word).Id;
+                    int idLanguage = allLanguages.First(l => l.ShortName == testItem.Language).Id;
+                    Console.WriteLine(idTest);
+                    _unitOfWork.TestTranslations.Create(new TestTranslation()
+                    {
+                        TestTranslationName = testItem.Translation,
+                        TestId = idTest,
+                        LanguageId = idLanguage
+                    });
+                    _unitOfWork.Save();
+                }
+                catch (InvalidOperationException)
+                {
+                    Console.WriteLine("Data isn't exist");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
     }
 }
