@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using BusinessLogicLayer.Initializer.Interfaces;
 using BusinessLogicLayer.ViewModels;
 using DataAccessLayer.DataBaseModels;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Metadata;
 using OfficeOpenXml;
 
 namespace BusinessLogicLayer.Initializer.Implementation
@@ -50,10 +48,12 @@ namespace BusinessLogicLayer.Initializer.Implementation
                         if (worksheet.Cells[i, j].Value == null) 
                             break;
 
-                        var data = new ParsedData();
-                        data.Word = worksheet.Cells[i, 1].Value.ToString();
-                        data.Language = worksheet.Cells[1, j].Value.ToString();
-                        data.Translation = worksheet.Cells[i, j].Value.ToString();
+                        var data = new ParsedData
+                        {
+                            Word = worksheet.Cells[i, 1].Value.ToString(),
+                            Language = worksheet.Cells[1, j].Value.ToString(),
+                            Translation = worksheet.Cells[i, j].Value.ToString()
+                        };
                         parsedData.Add(data);
                     }
                 }
@@ -62,9 +62,62 @@ namespace BusinessLogicLayer.Initializer.Implementation
             return parsedData;
         }
 
-        public void WriteDataToDataBase(List<ParsedData> data)
+        public void WriteLanguageDataToDataBase()
+        {
+            //Write data to languages table
+            List<ParsedData> languageData = ParseData(GetDataFromFile(CreatePath()));
+            List<Language> allLanguages = new List<Language>();
+            for (int i = 0, j = 0; i < languageData.Count; i++)
+            {
+                if (allLanguages.FirstOrDefault(l => l.FullName == languageData[i].Word) == null)
+                {
+                    allLanguages.Add(new Language()
+                    {
+                        ShortName = languageData[i + j].Language,
+                        FullName = languageData[i + j++].Word
+                    });
+                }
+            }
+
+            //Save data to dataBase
+            foreach (var item in allLanguages)
+            {
+                _unitOfWork.Languages.Create(item);
+                _unitOfWork.Save();
+            }
+
+            //Write data to languageTranlations table
+            allLanguages = _unitOfWork.Languages.GetAll().ToList();
+            foreach (var language in languageData)
+            {
+                try
+                {
+                    int idLanguageWord = allLanguages.First(l => l.FullName == language.Word).Id;
+                    int idLanguage = allLanguages.First(l => l.ShortName == language.Language).Id;
+                    _unitOfWork.LanguageTranslations.Create(new LanguageTranslation()
+                    {
+                        LanguageTranslationName = language.Translation,
+                        LanguageWordId = idLanguageWord,
+                        LanguageId = idLanguage
+                    });
+                    _unitOfWork.Save();
+                }
+                catch (InvalidOperationException)
+                {
+                    Console.WriteLine("Data isn't exist");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        public void WriteDataToDataBase()
         {
             
+
+            throw new NotImplementedException();
         }
     }
 }

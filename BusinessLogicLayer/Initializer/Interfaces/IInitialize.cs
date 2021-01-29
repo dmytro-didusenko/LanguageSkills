@@ -18,6 +18,8 @@ namespace BusinessLogicLayer.Initializer.Interfaces
 
         List<ParsedData> ParseData(ExcelWorksheet worksheet);
 
-        void WriteDataToDataBase(List<ParsedData> data);
+        void WriteLanguageDataToDataBase();
+
+        void WriteDataToDataBase();
     }
 }

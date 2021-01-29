@@ -17,6 +17,7 @@ namespace BusinessLogicLayer
         private TestRepository _testRepository;
         private TestTranslationRepository _testTranslationRepository;
         private LanguageRepository _languageRepository;
+        private LanguageTranslationRepository _languageTranslationRepository;
 
         public CategoryRepository Categories
         {
@@ -104,6 +105,16 @@ namespace BusinessLogicLayer
                 if (_languageRepository == null)
                     _languageRepository = new LanguageRepository(_db);
                 return _languageRepository;
+            }
+        }
+
+        public LanguageTranslationRepository LanguageTranslations
+        {
+            get
+            {
+                if (_languageTranslationRepository == null)
+                    _languageTranslationRepository = new LanguageTranslationRepository(_db);
+                return _languageTranslationRepository;
             }
         }
 

@@ -103,6 +103,18 @@ CREATE TABLE "TestTranslations" (
 
 
 
+CREATE TABLE "LanguageTranslations" (
+	"Id" serial NOT NULL,
+	"LanguageTranslationName" TEXT NOT NULL,
+	"LanguageWordId" integer NOT NULL,
+	"LanguageId" integer NOT NULL,
+	CONSTRAINT "LanguageTranslations_pk" PRIMARY KEY ("Id")
+) WITH (
+  OIDS=FALSE
+);
+
+
+
 
 ALTER TABLE "SubCategories" ADD CONSTRAINT "SubCategories_fk0" FOREIGN KEY ("CategoryId") REFERENCES "Categories"("Id");
 
@@ -122,3 +134,5 @@ ALTER TABLE "WordTranslations" ADD CONSTRAINT "WordTranslations_fk1" FOREIGN KEY
 ALTER TABLE "TestTranslations" ADD CONSTRAINT "TestTranslations_fk0" FOREIGN KEY ("TestId") REFERENCES "Tests"("Id");
 ALTER TABLE "TestTranslations" ADD CONSTRAINT "TestTranslations_fk1" FOREIGN KEY ("LanguageId") REFERENCES "Languages"("Id");
 
+ALTER TABLE "LanguageTranslations" ADD CONSTRAINT "LanguageTranslations_fk0" FOREIGN KEY ("LanguageWordId") REFERENCES "Languages"("Id");
+ALTER TABLE "LanguageTranslations" ADD CONSTRAINT "LanguageTranslations_fk1" FOREIGN KEY ("LanguageId") REFERENCES "Languages"("Id");

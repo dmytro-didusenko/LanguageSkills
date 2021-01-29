@@ -20,6 +20,7 @@ namespace DataAccessLayer.DataBaseModels
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<CategoryTranslation> CategoryTranslations { get; set; }
         public virtual DbSet<Language> Languages { get; set; }
+        public virtual DbSet<LanguageTranslation> LanguageTranslations { get; set; }
         public virtual DbSet<SubCategory> SubCategories { get; set; }
         public virtual DbSet<SubCategoryTranslation> SubCategoryTranslations { get; set; }
         public virtual DbSet<Test> Tests { get; set; }
@@ -42,8 +43,6 @@ namespace DataAccessLayer.DataBaseModels
 
             modelBuilder.Entity<Category>(entity =>
             {
-                entity.ToTable("Categories", "LanguageSkills");
-
                 entity.Property(e => e.CategoryImagePath).IsRequired();
 
                 entity.Property(e => e.CategoryName).IsRequired();
@@ -51,8 +50,6 @@ namespace DataAccessLayer.DataBaseModels
 
             modelBuilder.Entity<CategoryTranslation>(entity =>
             {
-                entity.ToTable("CategoryTranslations", "LanguageSkills");
-
                 entity.Property(e => e.CategoryTranslationName).IsRequired();
 
                 entity.HasOne(d => d.Categoty)
@@ -70,17 +67,30 @@ namespace DataAccessLayer.DataBaseModels
 
             modelBuilder.Entity<Language>(entity =>
             {
-                entity.ToTable("Languages", "LanguageSkills");
-
                 entity.Property(e => e.FullName).IsRequired();
 
                 entity.Property(e => e.ShortName).IsRequired();
             });
 
+            modelBuilder.Entity<LanguageTranslation>(entity =>
+            {
+                entity.Property(e => e.LanguageTranslationName).IsRequired();
+
+                entity.HasOne(d => d.Language)
+                    .WithMany(p => p.LanguageTranslationLanguages)
+                    .HasForeignKey(d => d.LanguageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("LanguageTranslations_fk1");
+
+                entity.HasOne(d => d.LanguageWord)
+                    .WithMany(p => p.LanguageTranslationLanguageWords)
+                    .HasForeignKey(d => d.LanguageWordId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("LanguageTranslations_fk0");
+            });
+
             modelBuilder.Entity<SubCategory>(entity =>
             {
-                entity.ToTable("SubCategories", "LanguageSkills");
-
                 entity.Property(e => e.SubCategoryImagePath).IsRequired();
 
                 entity.Property(e => e.SubCategoryName).IsRequired();
@@ -94,8 +104,6 @@ namespace DataAccessLayer.DataBaseModels
 
             modelBuilder.Entity<SubCategoryTranslation>(entity =>
             {
-                entity.ToTable("SubCategoryTranslations", "LanguageSkills");
-
                 entity.Property(e => e.SubCategoryTranslationName).IsRequired();
 
                 entity.HasOne(d => d.Language)
@@ -113,15 +121,11 @@ namespace DataAccessLayer.DataBaseModels
 
             modelBuilder.Entity<Test>(entity =>
             {
-                entity.ToTable("Tests", "LanguageSkills");
-
                 entity.Property(e => e.TestName).IsRequired();
             });
 
             modelBuilder.Entity<TestTranslation>(entity =>
             {
-                entity.ToTable("TestTranslations", "LanguageSkills");
-
                 entity.Property(e => e.TestTranslationName).IsRequired();
 
                 entity.HasOne(d => d.Language)
@@ -139,8 +143,6 @@ namespace DataAccessLayer.DataBaseModels
 
             modelBuilder.Entity<Word>(entity =>
             {
-                entity.ToTable("Words", "LanguageSkills");
-
                 entity.Property(e => e.WordImagePath).IsRequired();
 
                 entity.Property(e => e.WordName).IsRequired();
@@ -154,8 +156,6 @@ namespace DataAccessLayer.DataBaseModels
 
             modelBuilder.Entity<WordTranslation>(entity =>
             {
-                entity.ToTable("WordTranslations", "LanguageSkills");
-
                 entity.Property(e => e.WordTranslationName).IsRequired();
 
                 entity.HasOne(d => d.Language)
