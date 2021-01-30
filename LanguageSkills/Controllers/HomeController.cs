@@ -17,9 +17,9 @@ namespace LanguageSkills.Controllers
         public void Index()
         {
             Initialize initializeLanguages = new Initialize();
-            var path = initializeLanguages.CreatePath();
-            var worksheet = initializeLanguages.GetDataFromFile(path);
-            initializeLanguages.WriteTestDataToDataBase();
+            //var path = initializeLanguages.CreatePath();
+            //var worksheet = initializeLanguages.GetDataFromFile(path);
+            initializeLanguages.WriteCategoryDataToDataBase();
 
             //Category category = new Category();
             //category.CategoryName = "New";
