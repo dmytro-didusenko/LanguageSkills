@@ -19,7 +19,7 @@ namespace LanguageSkills.Controllers
             Initialize initializeLanguages = new Initialize();
             //var path = initializeLanguages.CreatePath();
             //var worksheet = initializeLanguages.GetDataFromFile(path);
-            initializeLanguages.WriteCategoryDataToDataBase();
+            initializeLanguages.WriteSubCategoryDataToDataBase();
 
             //Category category = new Category();
             //category.CategoryName = "New";

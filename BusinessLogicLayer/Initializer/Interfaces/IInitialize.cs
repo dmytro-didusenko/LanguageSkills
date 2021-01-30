@@ -9,8 +9,6 @@ namespace BusinessLogicLayer.Initializer.Interfaces
 {
     interface IIInitialize
     {
-        string CreatePath(string directoryName, string fileName);
-
         ExcelWorksheet GetDataFromFile(string path);
 
         List<ParsedData> ParseData(ExcelWorksheet worksheet);
@@ -20,5 +18,7 @@ namespace BusinessLogicLayer.Initializer.Interfaces
         void WriteTestDataToDataBase();
 
         void WriteCategoryDataToDataBase();
+
+        void WriteSubCategoryDataToDataBase();
     }
 }

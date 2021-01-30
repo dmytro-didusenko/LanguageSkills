@@ -23,9 +23,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.Languages.Find(id);
         }
 
-        public void Create(Language language)
+        public void CreateRange(List<Language> languages)
         {
-            _db.Languages.Add(language);
+            _db.Languages.AddRange(languages);
         }
 
         public void Update(Language language)

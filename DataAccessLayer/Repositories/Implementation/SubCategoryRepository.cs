@@ -25,9 +25,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.SubCategories.Find(id);
         }
 
-        public void Create(SubCategory subCategory)
+        public void CreateRange(List<SubCategory> subCategories)
         {
-            _db.SubCategories.Add(subCategory);
+            _db.SubCategories.AddRange(subCategories);
         }
 
         public void Update(SubCategory subCategory)

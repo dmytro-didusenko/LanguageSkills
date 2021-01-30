@@ -25,9 +25,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.Words.Find(id);
         }
 
-        public void Create(Word word)
+        public void CreateRange(List<Word> words)
         {
-            _db.Words.Add(word);
+            _db.Words.AddRange(words);
         }
 
         public void Update(Word word)

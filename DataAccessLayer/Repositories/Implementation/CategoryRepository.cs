@@ -25,9 +25,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.Categories.Find(id);
         }
 
-        public void Create(Category category)
+        public void CreateRange(List<Category> categories)
         {
-            _db.Categories.Add(category);
+            _db.Categories.AddRange(categories);
         }
 
         public void Update(Category category)

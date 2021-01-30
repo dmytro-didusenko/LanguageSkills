@@ -25,9 +25,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.Tests.Find(id);
         }
 
-        public void Create(Test test)
+        public void CreateRange(List<Test> tests)
         {
-            _db.Tests.Add(test);
+            _db.Tests.AddRange(tests);
         }
 
         public void Update(Test test)

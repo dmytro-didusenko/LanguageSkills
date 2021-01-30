@@ -25,9 +25,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.WordTranslations.Find(id);
         }
 
-        public void Create(WordTranslation wordTranslation)
+        public void CreateRange(List<WordTranslation> wordTranslations)
         {
-            _db.WordTranslations.Add(wordTranslation);
+            _db.WordTranslations.AddRange(wordTranslations);
         }
 
         public void Update(WordTranslation wordTranslation)

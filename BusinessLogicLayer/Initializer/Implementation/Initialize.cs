@@ -14,18 +14,9 @@ namespace BusinessLogicLayer.Initializer.Implementation
     {
         private UnitOfWork _unitOfWork = new UnitOfWork();
 
-        public string CreatePath(string directoryName = "", string fileName = "Languages")
+        private string _createPath(string directoryName, string fileName, string fileExtension)
         {
-            string rootPath = Directory.GetCurrentDirectory() + @"\wwwroot\Dictionary\" + directoryName + fileName + ".xlsx";
-            Console.WriteLine(rootPath);
-            return rootPath;
-        }
-
-        public string CreatePath(string directoryName = "")
-        {
-            string rootPath = @"\wwwroot\Dictionary\" + directoryName;
-            Console.WriteLine(rootPath);
-            return rootPath;
+            return @"\wwwroot\Dictionary\" + directoryName + fileName + fileExtension;
         }
 
         public ExcelWorksheet GetDataFromFile(string path)
@@ -72,8 +63,9 @@ namespace BusinessLogicLayer.Initializer.Implementation
         public void WriteLanguageDataToDataBase()
         {
             //Get data from file
-            List<ParsedData> languageData = ParseData(GetDataFromFile(CreatePath("", "Languages")));
-            //Write data to languages table
+            List<ParsedData> languageData = ParseData(GetDataFromFile(
+                Directory.GetCurrentDirectory() + _createPath("", "Languages", ".xlsx")));
+            //Write data to languages
             List<Language> allLanguages = new List<Language>();
             for (int i = 0, j = 0; i < languageData.Count; i++)
             {
@@ -88,29 +80,28 @@ namespace BusinessLogicLayer.Initializer.Implementation
             }
 
             //Save data to dataBase
-            foreach (var item in allLanguages)
-            {
-                _unitOfWork.Languages.Create(item);
-                _unitOfWork.Save();
-            }
+            _unitOfWork.Languages.CreateRange(allLanguages);
+            _unitOfWork.Save();
+            
 
             //Get all languages
             allLanguages = _unitOfWork.Languages.GetAll().ToList();
-
-            //Write data to languageTranlations table to dataBase
+            //Write data to language translations
+            var allLanguageTranslations = new List<LanguageTranslation>();
             foreach (var language in languageData)
             {
                 try
                 {
                     int idLanguageWord = allLanguages.First(l => l.FullName == language.Word).Id;
                     int idLanguage = allLanguages.First(l => l.ShortName == language.Language).Id;
-                    _unitOfWork.LanguageTranslations.Create(new LanguageTranslation()
+
+
+                    allLanguageTranslations.Add(new LanguageTranslation()
                     {
                         LanguageTranslationName = language.Translation,
                         LanguageWordId = idLanguageWord,
                         LanguageId = idLanguage
                     });
-                    _unitOfWork.Save();
                 }
                 catch (InvalidOperationException)
                 {
@@ -121,43 +112,52 @@ namespace BusinessLogicLayer.Initializer.Implementation
                     Console.WriteLine(e);
                 }
             }
+
+            //Save data to dataBase
+            _unitOfWork.LanguageTranslations.CreateRange(allLanguageTranslations);
+            _unitOfWork.Save();
         }
 
         public void WriteTestDataToDataBase()
         {
             //Get data from file
-            List<ParsedData> testData = ParseData(GetDataFromFile(CreatePath("", "TestsNames")));
+            List<ParsedData> testData = ParseData(GetDataFromFile(
+                Directory.GetCurrentDirectory() + _createPath("", "TestsNames", ".xlsx")));
 
             //Get all list of language
             List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
 
-            //Write data to test table and save to dataBase
+            //Write data to tests
             Test test = new Test();
+            List<Test> allTests = new List<Test>();
             foreach (var testItem in testData.Where(testItem => test.TestName != testItem.Word))
             {
                 test.Id = 0;
                 test.TestName = testItem.Word;
-                _unitOfWork.Tests.Create(test);
-                _unitOfWork.Save();
+                allTests.Add(test);
             }
 
-            //Get all tests
-            List<Test> allTests = _unitOfWork.Tests.GetAll().ToList();
+            //Save data to dataBase
+            _unitOfWork.Tests.CreateRange(allTests);
+            _unitOfWork.Save();
 
-            //Write test translation and save to dataBase
+
+            //Get all tests
+            allTests = _unitOfWork.Tests.GetAll().ToList();
+            List<TestTranslation> allTestTranslations = new List<TestTranslation>();
+            //Write test translation
             foreach (var testItem in testData)
             {
                 try
                 {
                     int idTest = allTests.First(l => l.TestName == testItem.Word).Id;
                     int idLanguage = allLanguages.First(l => l.ShortName == testItem.Language).Id;
-                    _unitOfWork.TestTranslations.Create(new TestTranslation()
+                    allTestTranslations.Add(new TestTranslation()
                     {
                         TestTranslationName = testItem.Translation,
                         TestId = idTest,
                         LanguageId = idLanguage
                     });
-                    _unitOfWork.Save();
                 }
                 catch (InvalidOperationException)
                 {
@@ -168,44 +168,53 @@ namespace BusinessLogicLayer.Initializer.Implementation
                     Console.WriteLine(e);
                 }
             }
+
+            //Save data to dataBase
+            _unitOfWork.TestTranslations.CreateRange(allTestTranslations);
+            _unitOfWork.Save();
         }
 
         public void WriteCategoryDataToDataBase()
         {
             //Get data from file
-            List<ParsedData> categoryData = ParseData(GetDataFromFile(CreatePath("", "CategoriesRoot")));
+            List<ParsedData> categoryData = ParseData(GetDataFromFile(
+                Directory.GetCurrentDirectory() + _createPath("", "CategoriesRoot", ".xlsx")));
 
             //Get all list of language
             List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
 
-            //Write data to categories table and save to dataBase
-            var category = new Category();
+            //Write data to categories
+            Category category = new Category();
+            List<Category> allCategories = new List<Category>();
             foreach (var categoryItem in categoryData.Where(categoryItem => category.CategoryName != categoryItem.Word))
             {
                 category.Id = 0;
                 category.CategoryName = categoryItem.Word;
-                category.CategoryImagePath = CreatePath(@"pictures\" + category.CategoryName + ".jpg");
-                _unitOfWork.Categories.Create(category);
-                _unitOfWork.Save();
+                category.CategoryImagePath = _createPath(@"pictures\", category.CategoryName, ".jpg");
+                allCategories.Add(category);
             }
 
-            //Get all categories
-            List<Category> allCategories = _unitOfWork.Categories.GetAll().ToList();
+            //Save data to dataBase
+            _unitOfWork.Categories.CreateRange(allCategories);
+            _unitOfWork.Save();
 
-            //Write category translation and save to dataBase
+
+            //Get all categories
+            allCategories = _unitOfWork.Categories.GetAll().ToList();
+            List<CategoryTranslation> allCategoryTranslations = new List<CategoryTranslation>();
+            //Write category translation
             foreach (var categoryItem in categoryData)
             {
                 try
                 {
                     int idCategory = allCategories.First(l => l.CategoryName == categoryItem.Word).Id;
                     int idLanguage = allLanguages.First(l => l.ShortName == categoryItem.Language).Id;
-                    _unitOfWork.CategoryTranslations.Create(new CategoryTranslation()
+                    allCategoryTranslations.Add(new CategoryTranslation()
                     {
                         CategoryTranslationName = categoryItem.Translation,
                         CategotyId = idCategory,
                         LanguageId = idLanguage
                     });
-                    _unitOfWork.Save();
                 }
                 catch (InvalidOperationException)
                 {
@@ -216,6 +225,90 @@ namespace BusinessLogicLayer.Initializer.Implementation
                     Console.WriteLine(e);
                 }
             }
+
+            //Save data to dataBase
+            _unitOfWork.CategoryTranslations.CreateRange(allCategoryTranslations);
+            _unitOfWork.Save();
+
         }
+
+
+
+
+
+
+
+        public void WriteSubCategoryDataToDataBase()
+        {
+            //Get all categories
+            //List<Category> allCategories = _unitOfWork.Categories.GetAll().ToList();
+            //foreach (var category in allCategories)
+            //{
+            //    //Get data from file
+            //    List<ParsedData> sabCategoryData = ParseData(GetDataFromFile(
+            //        Directory.GetCurrentDirectory() + _createPath(category.CategoryName + @"\", category.CategoryName, ".xlsx")));
+
+            //    foreach (var item in sabCategoryData)
+            //    {
+            //        Console.WriteLine(item.Word);
+            //    }
+            //}
+
+
+
+
+            ////Get all list of language
+            //List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
+
+            ////Write data to categories
+            //Category category = new Category();
+            //List<Category> allCategories = new List<Category>();
+            //foreach (var categoryItem in categoryData.Where(categoryItem => category.CategoryName != categoryItem.Word))
+            //{
+            //    category.Id = 0;
+            //    category.CategoryName = categoryItem.Word;
+            //    category.CategoryImagePath = _createPath(@"pictures\", category.CategoryName, ".jpg");
+            //    allCategories.Add(category);
+            //}
+
+            ////Save data to dataBase
+            //_unitOfWork.Categories.CreateRange(allCategories);
+            //_unitOfWork.Save();
+
+
+            ////Get all categories
+            //allCategories = _unitOfWork.Categories.GetAll().ToList();
+            //List<CategoryTranslation> allCategoryTranslations = new List<CategoryTranslation>();
+            ////Write category translation
+            //foreach (var categoryItem in categoryData)
+            //{
+            //    try
+            //    {
+            //        int idCategory = allCategories.First(l => l.CategoryName == categoryItem.Word).Id;
+            //        int idLanguage = allLanguages.First(l => l.ShortName == categoryItem.Language).Id;
+            //        allCategoryTranslations.Add(new CategoryTranslation()
+            //        {
+            //            CategoryTranslationName = categoryItem.Translation,
+            //            CategotyId = idCategory,
+            //            LanguageId = idLanguage
+            //        });
+            //    }
+            //    catch (InvalidOperationException)
+            //    {
+            //        Console.WriteLine("Data isn't exist");
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Console.WriteLine(e);
+            //    }
+            //}
+
+            ////Save data to dataBase
+            //_unitOfWork.CategoryTranslations.CreateRange(allCategoryTranslations);
+            //_unitOfWork.Save();
+
+        }
+
+
     }
 }

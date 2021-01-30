@@ -25,9 +25,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.TestTranslations.Find(id);
         }
 
-        public void Create(TestTranslation testTranslation)
+        public void CreateRange(List<TestTranslation> testTranslations)
         {
-            _db.TestTranslations.Add(testTranslation);
+            _db.TestTranslations.AddRange(testTranslations);
         }
 
         public void Update(TestTranslation testTranslation)

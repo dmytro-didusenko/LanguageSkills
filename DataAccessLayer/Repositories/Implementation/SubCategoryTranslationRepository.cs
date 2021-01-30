@@ -25,9 +25,9 @@ namespace DataAccessLayer.Repositories.Implementation
             return _db.SubCategoryTranslations.Find(id);
         }
 
-        public void Create(SubCategoryTranslation subCategoryTranslation)
+        public void CreateRange(List<SubCategoryTranslation> subCategoryTranslations)
         {
-            _db.SubCategoryTranslations.Add(subCategoryTranslation);
+            _db.SubCategoryTranslations.AddRange(subCategoryTranslations);
         }
 
         public void Update(SubCategoryTranslation subCategoryTranslation)
