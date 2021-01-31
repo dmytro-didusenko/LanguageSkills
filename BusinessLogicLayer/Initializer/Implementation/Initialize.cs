@@ -232,83 +232,73 @@ namespace BusinessLogicLayer.Initializer.Implementation
 
         }
 
-
-
-
-
-
-
         public void WriteSubCategoryDataToDataBase()
         {
             //Get all categories
-            //List<Category> allCategories = _unitOfWork.Categories.GetAll().ToList();
-            //foreach (var category in allCategories)
-            //{
-            //    //Get data from file
-            //    List<ParsedData> sabCategoryData = ParseData(GetDataFromFile(
-            //        Directory.GetCurrentDirectory() + _createPath(category.CategoryName + @"\", category.CategoryName, ".xlsx")));
+            List<Category> allCategories = _unitOfWork.Categories.GetAll().ToList();
 
-            //    foreach (var item in sabCategoryData)
-            //    {
-            //        Console.WriteLine(item.Word);
-            //    }
-            //}
+            //Get all list of language
+            List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
 
+            foreach (var category in allCategories)
+            {
+                //Get data from file
+                List<ParsedData> subCategoryData = ParseData(GetDataFromFile(
+                    Directory.GetCurrentDirectory() + _createPath(category.CategoryName + @"\", 
+                        category.CategoryName, ".xlsx")));
 
+                //Write data to subCategories
+                List<SubCategory> allSubCategories = new List<SubCategory>();
+                string tempSubCategory = "";
+                foreach (var subCategoryItem in subCategoryData.Where(subCategoryItem => 
+                    tempSubCategory != subCategoryItem.Word))
+                {
+                    tempSubCategory = subCategoryItem.Word;
 
+                    allSubCategories.Add(new SubCategory()
+                    {
+                        SubCategoryName = subCategoryItem.Word,
+                        SubCategoryImagePath = _createPath(category.CategoryName + @"\pictures\",
+                            subCategoryItem.Word, ".jpg"),
+                        CategoryId = category.Id
+                });
+                }
 
-            ////Get all list of language
-            //List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
+                //Save data to dataBase
+                _unitOfWork.SubCategories.CreateRange(allSubCategories);
+                _unitOfWork.Save();
 
-            ////Write data to categories
-            //Category category = new Category();
-            //List<Category> allCategories = new List<Category>();
-            //foreach (var categoryItem in categoryData.Where(categoryItem => category.CategoryName != categoryItem.Word))
-            //{
-            //    category.Id = 0;
-            //    category.CategoryName = categoryItem.Word;
-            //    category.CategoryImagePath = _createPath(@"pictures\", category.CategoryName, ".jpg");
-            //    allCategories.Add(category);
-            //}
+                //Get all subCategories
+                allSubCategories = _unitOfWork.SubCategories.GetAll().ToList();
+                List<SubCategoryTranslation> allSubCategoryTranslations = new List<SubCategoryTranslation>();
+                //Write subCategory translation
+                foreach (var subCategoryItem in subCategoryData)
+                {
+                    try
+                    {
+                        int idSubCategory = allSubCategories.First(l => l.SubCategoryName == subCategoryItem.Word).Id;
+                        int idLanguage = allLanguages.First(l => l.ShortName == subCategoryItem.Language).Id;
+                        allSubCategoryTranslations.Add(new SubCategoryTranslation()
+                        {
+                            SubCategoryTranslationName = subCategoryItem.Translation,
+                            SubCategoryId = idSubCategory,
+                            LanguageId = idLanguage
+                        });
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        Console.WriteLine("Data isn't exist");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
 
-            ////Save data to dataBase
-            //_unitOfWork.Categories.CreateRange(allCategories);
-            //_unitOfWork.Save();
-
-
-            ////Get all categories
-            //allCategories = _unitOfWork.Categories.GetAll().ToList();
-            //List<CategoryTranslation> allCategoryTranslations = new List<CategoryTranslation>();
-            ////Write category translation
-            //foreach (var categoryItem in categoryData)
-            //{
-            //    try
-            //    {
-            //        int idCategory = allCategories.First(l => l.CategoryName == categoryItem.Word).Id;
-            //        int idLanguage = allLanguages.First(l => l.ShortName == categoryItem.Language).Id;
-            //        allCategoryTranslations.Add(new CategoryTranslation()
-            //        {
-            //            CategoryTranslationName = categoryItem.Translation,
-            //            CategotyId = idCategory,
-            //            LanguageId = idLanguage
-            //        });
-            //    }
-            //    catch (InvalidOperationException)
-            //    {
-            //        Console.WriteLine("Data isn't exist");
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Console.WriteLine(e);
-            //    }
-            //}
-
-            ////Save data to dataBase
-            //_unitOfWork.CategoryTranslations.CreateRange(allCategoryTranslations);
-            //_unitOfWork.Save();
-
+                //Save data to dataBase
+                _unitOfWork.SubCategoryTranslations.CreateRange(allSubCategoryTranslations);
+                _unitOfWork.Save();
+            }
         }
-
-
     }
 }

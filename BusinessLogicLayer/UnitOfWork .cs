@@ -120,7 +120,15 @@ namespace BusinessLogicLayer
 
         public void Save()
         {
-            _db.SaveChanges();
+            try
+            {
+                _db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
         }
 
         private bool disposed = false;
