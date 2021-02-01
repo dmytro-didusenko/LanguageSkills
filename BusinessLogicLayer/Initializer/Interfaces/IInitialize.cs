@@ -20,5 +20,7 @@ namespace BusinessLogicLayer.Initializer.Interfaces
         void WriteCategoryDataToDataBase();
 
         void WriteSubCategoryDataToDataBase();
+
+        void WriteWordDataToDataBase();
     }
 }

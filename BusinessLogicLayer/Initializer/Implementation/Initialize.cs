@@ -43,16 +43,19 @@ namespace BusinessLogicLayer.Initializer.Implementation
                 {
                     for (int j = 2; j <= columns; j++)
                     {
-                        if (worksheet.Cells[i, j].Value == null) 
-                            break;
-
-                        var data = new ParsedData
+                        if (worksheet.Cells[i, j].Value != null && worksheet.Cells[i, 1].Value != null && 
+                            worksheet.Cells[1, j].Value != null)
                         {
-                            Word = worksheet.Cells[i, 1].Value.ToString(),
-                            Language = worksheet.Cells[1, j].Value.ToString(),
-                            Translation = worksheet.Cells[i, j].Value.ToString()
-                        };
-                        parsedData.Add(data);
+                            var data = new ParsedData
+                            {
+                                Word = worksheet.Cells[i, 1].Value.ToString(),
+                                Language = worksheet.Cells[1, j].Value.ToString(),
+                                Translation = worksheet.Cells[i, j].Value.ToString()
+                            };
+                            parsedData.Add(data);
+                        }
+                        else
+                            break;
                     }
                 }
             }
@@ -300,5 +303,91 @@ namespace BusinessLogicLayer.Initializer.Implementation
                 _unitOfWork.Save();
             }
         }
+
+        public void WriteWordDataToDataBase()
+        {
+            //Get all categories
+            List<Category> allCategories = _unitOfWork.Categories.GetAll().ToList();
+
+            //Get all subCategories
+            List<SubCategory> allSubCategories = _unitOfWork.SubCategories.GetAll().ToList();
+
+            //Get all list of language
+            List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
+
+            foreach (var category in allCategories)
+            {
+                foreach (var subCategory in allSubCategories.Where(s => s.CategoryId == category.Id))
+                {
+                    //Get data from file
+                    List<ParsedData> wordData = ParseData(GetDataFromFile(
+                        Directory.GetCurrentDirectory() + _createPath(
+                            category.CategoryName + @"\" + subCategory.SubCategoryName + @"\",
+                            subCategory.SubCategoryName, ".xlsx")));
+
+                    //Write data to word table in dataBase
+                    List<Word> allWord = new List<Word>();
+                    string tempWord = "";
+                    foreach (var word in wordData.Where(word =>
+                        tempWord != word.Word))
+                    {
+                        tempWord = word.Word;
+
+                        allWord.Add(new Word()
+                        {
+                            WordName = word.Word,
+                            WordImagePath = _createPath(category.CategoryName + @"\" + subCategory.SubCategoryName 
+                                                        + @"\pictures\", tempWord, ".jpg"),
+                            SubCategoryId = subCategory.Id
+                        });
+                    }
+
+                    ////Save data to dataBase
+                    //_unitOfWork.Words.CreateRange(allWord);
+                    //_unitOfWork.Save();
+                }
+
+
+                Console.WriteLine(count++);
+                ////Get all subCategories
+
+
+
+                //allSubCategories = _unitOfWork.SubCategories.GetAll().ToList();
+                //List<SubCategoryTranslation> allSubCategoryTranslations = new List<SubCategoryTranslation>();
+                ////Write subCategory translation
+                //foreach (var subCategoryItem in subCategoryData)
+                //{
+                //    try
+                //    {
+                //        int idSubCategory = allSubCategories.First(l => l.SubCategoryName == subCategoryItem.Word).Id;
+                //        int idLanguage = allLanguages.First(l => l.ShortName == subCategoryItem.Language).Id;
+                //        allSubCategoryTranslations.Add(new SubCategoryTranslation()
+                //        {
+                //            SubCategoryTranslationName = subCategoryItem.Translation,
+                //            SubCategoryId = idSubCategory,
+                //            LanguageId = idLanguage
+                //        });
+                //    }
+                //    catch (InvalidOperationException)
+                //    {
+                //        Console.WriteLine("Data isn't exist");
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        Console.WriteLine(e);
+                //    }
+                //}
+
+                ////Save data to dataBase
+                //_unitOfWork.SubCategoryTranslations.CreateRange(allSubCategoryTranslations);
+                //_unitOfWork.Save();
+            }
+        }
+
+
+
+
+
     }
 }
