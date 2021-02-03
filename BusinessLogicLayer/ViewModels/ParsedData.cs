@@ -1,6 +1,8 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace InitializeDataBase.ViewModels
+namespace BusinessLogicLayer.ViewModels
 {
     public class ParsedData
     {

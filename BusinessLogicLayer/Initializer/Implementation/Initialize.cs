@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BusinessLogicLayer;
-using InitializeDataBase.ViewModels;
+using BusinessLogicLayer.Initializer.Interfaces;
+using BusinessLogicLayer.ViewModels;
 using DataAccessLayer.DataBaseModels;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.Metadata;
 using OfficeOpenXml;
 
-namespace InitializeDataBase
+namespace BusinessLogicLayer.Initializer.Implementation
 {
-    public class Initialize
+    public class Initialize : IIInitialize
     {
         private UnitOfWork _unitOfWork = new UnitOfWork();
-
-        private readonly string _pathRoot = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\LanguageSkills"));
-        private bool _isData = true;
-        private string _tempItem = "";
-        private int _countStage = 0;
 
         private string _createPath(string directoryName, string fileName, string fileExtension)
         {
@@ -65,19 +60,14 @@ namespace InitializeDataBase
                 }
             }
 
-            if (parsedData.Count == 0)
-            {
-                _isData = false;
-                Console.WriteLine("No data available");
-            }
             return parsedData;
         }
 
-        private void _writeLanguagesToDataBase()
+        public void WriteLanguageDataToDataBase()
         {
             //Get data from file
             List<ParsedData> languageData = ParseData(GetDataFromFile(
-                _pathRoot + _createPath("", "Languages", ".xlsx")));
+                Directory.GetCurrentDirectory() + _createPath("", "Languages", ".xlsx")));
             //Write data to languages
             List<Language> allLanguages = new List<Language>();
             for (int i = 0, j = 0; i < languageData.Count; i++)
@@ -92,13 +82,10 @@ namespace InitializeDataBase
                 }
             }
 
-            if (!_isData)
-                return;
             //Save data to dataBase
             _unitOfWork.Languages.CreateRange(allLanguages);
             _unitOfWork.Save();
-            Console.WriteLine("{0}/8. Languages have added", ++_countStage);
-
+            
 
             //Get all languages
             allLanguages = _unitOfWork.Languages.GetAll().ToList();
@@ -121,7 +108,6 @@ namespace InitializeDataBase
                 }
                 catch (InvalidOperationException)
                 {
-                    _isData = false;
                     Console.WriteLine("Data isn't exist");
                 }
                 catch (Exception e)
@@ -133,36 +119,30 @@ namespace InitializeDataBase
             //Save data to dataBase
             _unitOfWork.LanguageTranslations.CreateRange(allLanguageTranslations);
             _unitOfWork.Save();
-            Console.WriteLine("{0}/8. Language translations have added", ++_countStage);
         }
 
-        private void _writeTestsToDataBase()
+        public void WriteTestDataToDataBase()
         {
             //Get data from file
             List<ParsedData> testData = ParseData(GetDataFromFile(
-                _pathRoot + _createPath("", "TestsNames", ".xlsx")));
+                Directory.GetCurrentDirectory() + _createPath("", "TestsNames", ".xlsx")));
 
             //Get all list of language
             List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
 
             //Write data to tests
+            Test test = new Test();
             List<Test> allTests = new List<Test>();
-            foreach (var testItem in testData.Where(testItem => _tempItem != testItem.Word))
+            foreach (var testItem in testData.Where(testItem => test.TestName != testItem.Word))
             {
-                _tempItem = testItem.Word;
-
-                allTests.Add(new Test()
-                {
-                    TestName = testItem.Word
-                });
+                test.Id = 0;
+                test.TestName = testItem.Word;
+                allTests.Add(test);
             }
 
-            if (!_isData)
-                return;
             //Save data to dataBase
             _unitOfWork.Tests.CreateRange(allTests);
             _unitOfWork.Save();
-            Console.WriteLine("{0}/8. Tests have added", ++_countStage);
 
 
             //Get all tests
@@ -184,7 +164,6 @@ namespace InitializeDataBase
                 }
                 catch (InvalidOperationException)
                 {
-                    _isData = false;
                     Console.WriteLine("Data isn't exist");
                 }
                 catch (Exception e)
@@ -196,36 +175,31 @@ namespace InitializeDataBase
             //Save data to dataBase
             _unitOfWork.TestTranslations.CreateRange(allTestTranslations);
             _unitOfWork.Save();
-            Console.WriteLine("{0}/8. Test translations have added", ++_countStage);
         }
 
-        private void _writeCategoriesToDataBase()
+        public void WriteCategoryDataToDataBase()
         {
             //Get data from file
             List<ParsedData> categoryData = ParseData(GetDataFromFile(
-                _pathRoot + _createPath("", "CategoriesRoot", ".xlsx")));
+                Directory.GetCurrentDirectory() + _createPath("", "CategoriesRoot", ".xlsx")));
 
             //Get all list of language
             List<Language> allLanguages = _unitOfWork.Languages.GetAll().ToList();
 
             //Write data to categories
+            Category category = new Category();
             List<Category> allCategories = new List<Category>();
-            foreach (var categoryItem in categoryData.Where(categoryItem => _tempItem != categoryItem.Word))
+            foreach (var categoryItem in categoryData.Where(categoryItem => category.CategoryName != categoryItem.Word))
             {
-                _tempItem = categoryItem.Word;
-                allCategories.Add(new Category()
-                {
-                    CategoryName = categoryItem.Word,
-                    CategoryImagePath = _createPath(@"pictures\", categoryItem.Word, ".jpg")
-            });
+                category.Id = 0;
+                category.CategoryName = categoryItem.Word;
+                category.CategoryImagePath = _createPath(@"pictures\", category.CategoryName, ".jpg");
+                allCategories.Add(category);
             }
 
-            if (!_isData)
-                return;
             //Save data to dataBase
             _unitOfWork.Categories.CreateRange(allCategories);
             _unitOfWork.Save();
-            Console.WriteLine("{0}/8. Categories have added", ++_countStage);
 
 
             //Get all categories
@@ -247,7 +221,6 @@ namespace InitializeDataBase
                 }
                 catch (InvalidOperationException)
                 {
-                    _isData = false;
                     Console.WriteLine("Data isn't exist");
                 }
                 catch (Exception e)
@@ -259,10 +232,10 @@ namespace InitializeDataBase
             //Save data to dataBase
             _unitOfWork.CategoryTranslations.CreateRange(allCategoryTranslations);
             _unitOfWork.Save();
-            Console.WriteLine("{0}/8. Category translations have added", ++_countStage);
+
         }
 
-        private void _writeSubCategoriesToDataBase()
+        public void WriteSubCategoryDataToDataBase()
         {
             //Get all categories
             List<Category> allCategories = _unitOfWork.Categories.GetAll().ToList();
@@ -274,14 +247,16 @@ namespace InitializeDataBase
             {
                 //Get data from file
                 List<ParsedData> subCategoryData = ParseData(GetDataFromFile(
-                    _pathRoot + _createPath(category.CategoryName + @"\", 
+                    Directory.GetCurrentDirectory() + _createPath(category.CategoryName + @"\", 
                         category.CategoryName, ".xlsx")));
 
                 //Write data to subCategories
                 List<SubCategory> allSubCategories = new List<SubCategory>();
-                foreach (var subCategoryItem in subCategoryData.Where(subCategoryItem => _tempItem != subCategoryItem.Word))
+                string tempSubCategory = "";
+                foreach (var subCategoryItem in subCategoryData.Where(subCategoryItem => 
+                    tempSubCategory != subCategoryItem.Word))
                 {
-                    _tempItem = subCategoryItem.Word;
+                    tempSubCategory = subCategoryItem.Word;
 
                     allSubCategories.Add(new SubCategory()
                     {
@@ -292,8 +267,6 @@ namespace InitializeDataBase
                 });
                 }
 
-                if (!_isData)
-                    return;
                 //Save data to dataBase
                 _unitOfWork.SubCategories.CreateRange(allSubCategories);
                 _unitOfWork.Save();
@@ -317,7 +290,6 @@ namespace InitializeDataBase
                     }
                     catch (InvalidOperationException)
                     {
-                        _isData = false;
                         Console.WriteLine("Data isn't exist");
                     }
                     catch (Exception e)
@@ -330,10 +302,9 @@ namespace InitializeDataBase
                 _unitOfWork.SubCategoryTranslations.CreateRange(allSubCategoryTranslations);
                 _unitOfWork.Save();
             }
-            Console.WriteLine("{0}/8. SubCategories and subCategory translation have added", ++_countStage);
         }
 
-        private void _writeWordsToDataBase()
+        public void WriteWordDataToDataBase()
         {
             //Get all categories
             List<Category> allCategories = _unitOfWork.Categories.GetAll().ToList();
@@ -349,15 +320,18 @@ namespace InitializeDataBase
                 foreach (var subCategory in allSubCategories.Where(s => s.CategoryId == category.Id))
                 {
                     //Get data from file
-                    List<ParsedData> wordData = ParseData(GetDataFromFile(_pathRoot + _createPath(
+                    List<ParsedData> wordData = ParseData(GetDataFromFile(
+                        Directory.GetCurrentDirectory() + _createPath(
                             category.CategoryName + @"\" + subCategory.SubCategoryName + @"\",
                             subCategory.SubCategoryName, ".xlsx")));
 
                     //Write data to word table in dataBase
                     List<Word> allWords = new List<Word>();
-                    foreach (var word in wordData.Where(word => _tempItem != word.Word))
+                    string tempWord = "";
+                    foreach (var word in wordData.Where(word =>
+                        tempWord != word.Word))
                     {
-                        _tempItem = word.Word;
+                        tempWord = word.Word;
 
                         allWords.Add(new Word()
                         {
@@ -368,8 +342,6 @@ namespace InitializeDataBase
                         });
                     }
 
-                    if (!_isData)
-                        return;
                     //Save data to dataBase
                     _unitOfWork.Words.CreateRange(allWords);
                     _unitOfWork.Save();
@@ -392,12 +364,11 @@ namespace InitializeDataBase
                                 LanguageId = idLanguage,
                                 PronunciationPath = _createPath(category.CategoryName + @"\" + subCategory.SubCategoryName 
                                                                 + @"\pronounce\" + word.Language + @"\", 
-                                                            word.Word, ".wav"),
+                                                                    word.Word, ".wav"),
                             });
                         }
                         catch (InvalidOperationException)
                         {
-                            _isData = false;
                             Console.WriteLine("Data isn't exist");
                         }
                         catch (Exception e)
@@ -411,29 +382,6 @@ namespace InitializeDataBase
                     _unitOfWork.Save();
                 }
             }
-            Console.WriteLine("{0}/8. Words and word translations have added", ++_countStage);
-        }
-
-        public void Initializer()
-        {
-            Action initializeDataToDataBaseAction = _writeLanguagesToDataBase;
-            initializeDataToDataBaseAction += _writeTestsToDataBase;
-            initializeDataToDataBaseAction += _writeCategoriesToDataBase;
-            initializeDataToDataBaseAction += _writeSubCategoriesToDataBase;
-            initializeDataToDataBaseAction += _writeWordsToDataBase;
-            initializeDataToDataBaseAction += () =>
-            {
-                if (_isData && _countStage == 8)
-                {
-                    Console.WriteLine("Data successfully added to DataBase");
-                }
-                else
-                {
-                    Console.WriteLine("Something went wrong");
-                }
-            };
-
-            initializeDataToDataBaseAction();
         }
     }
 }
