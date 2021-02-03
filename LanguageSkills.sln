@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LanguageSkills", "LanguageSkills\LanguageSkills.csproj", "{EB7B5208-E2FC-427E-9A4D-1A40B2AFF392}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogicLayer", "BusinessLogicLayer\BusinessLogicLayer.csproj", "{1BFC0F28-6B27-423A-AAB3-DE8C83227729}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogicLayer", "BusinessLogicLayer\BusinessLogicLayer.csproj", "{1BFC0F28-6B27-423A-AAB3-DE8C83227729}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{623CD92B-B5EF-4DE0-8A5A-4030DE9A0B87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{623CD92B-B5EF-4DE0-8A5A-4030DE9A0B87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InitializeDataBase", "Initializer\InitializeDataBase.csproj", "{ED4A7FFC-5733-4FE9-9059-39A5C2BF3355}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{623CD92B-B5EF-4DE0-8A5A-4030DE9A0B87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{623CD92B-B5EF-4DE0-8A5A-4030DE9A0B87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{623CD92B-B5EF-4DE0-8A5A-4030DE9A0B87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED4A7FFC-5733-4FE9-9059-39A5C2BF3355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED4A7FFC-5733-4FE9-9059-39A5C2BF3355}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED4A7FFC-5733-4FE9-9059-39A5C2BF3355}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED4A7FFC-5733-4FE9-9059-39A5C2BF3355}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

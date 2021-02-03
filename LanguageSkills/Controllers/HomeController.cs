@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BusinessLogicLayer;
-using BusinessLogicLayer.Initializer.Implementation;
-using DataAccessLayer;
-using DataAccessLayer.DataBaseModels;
+
 
 namespace LanguageSkills.Controllers
 {
@@ -16,17 +10,7 @@ namespace LanguageSkills.Controllers
 
         public void Index()
         {
-            Initialize initializeLanguages = new Initialize();
-            //var path = initializeLanguages.CreatePath();
-            //var worksheet = initializeLanguages.GetDataFromFile(path);
-            initializeLanguages.WriteWordDataToDataBase();
 
-            //Category category = new Category();
-            //category.CategoryName = "New";
-            //category.CategoryImagePath = "dfa";
-            //_unitOfWork.Categories.Create(category);
-            //_unitOfWork.Save();
-            //Console.WriteLine(category.Id);
         }
     }
 }
