@@ -387,3 +387,6 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+#Ignore the directory with matherial
+Dictionary/
